@@ -1,0 +1,8 @@
+Este es mi primer proyecto FullStack hecho sin curso, con la ayuda fundamental de estas fuentes: 
+
+https://www.youtube.com/watch?v=AknTRNvX9rA
+https://mongoosejs.com/docs/guide.html
+https://www.digitalocean.com/community/tutorials/how-to-set-up-a-graphql-api-server-in-node-js
+http://expressjs.com/
+-LIZA, la mayoria de las cosas de graphql fueron posibles gracias
+a la inspiracion en LIZA
