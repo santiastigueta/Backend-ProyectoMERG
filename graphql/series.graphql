@@ -1,8 +1,21 @@
 type Serie {
-        title: String!
-        author: String!
-    }
-    
-    type Query {
-        series: [Serie]
-    }
+    _id: ID
+    name: String!
+    author: String!
+    rating: String!
+    releaseDate: String!
+}
+
+
+type Query {
+    getSerie(idSerie: ID): Serie
+}
+
+type Mutation {
+    createSerie(
+        nombre: String!
+        autor: String!
+        estrellas: String!
+        fechaLanzamiento: String!
+    ): Serie
+}
