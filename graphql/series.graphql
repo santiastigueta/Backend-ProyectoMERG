@@ -6,6 +6,10 @@ type Serie {
     releaseDate: String!
 }
 
+type nuevaSerie {
+    _id: ID!
+    name: String
+}
 
 type Query {
     getSerie(idSerie: ID): Serie
@@ -17,5 +21,15 @@ type Mutation {
         autor: String!
         estrellas: String!
         fechaLanzamiento: String!
+    ): Serie
+    updateSerie(
+        idSerie: ID!
+        nombre: String!
+        autor: String!
+        estrellas: String!
+        fechaLanzamiento: String!
+    ): Serie
+    deleteSerie(
+        idSerie: ID!
     ): Serie
 }

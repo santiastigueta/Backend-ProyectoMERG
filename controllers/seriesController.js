@@ -1,4 +1,4 @@
-import conectarDB from '../config/db.js';
+/* import conectarDB from '../config/db.js';
 import Series from '../models/seriesModel.js';
 
 
@@ -33,4 +33,4 @@ const deleteSerie = async(req, res, next) => {
     next();
 }
 export { main, postSeries, updateSeries };
-// realizar controllers para generar una creacion, una eliminacion, una actualizacion y mostrar.
+// realizar controllers para generar una creacion, una eliminacion, una actualizacion y mostrar. */
