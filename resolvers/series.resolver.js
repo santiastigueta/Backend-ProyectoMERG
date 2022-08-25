@@ -4,9 +4,6 @@ const seriesResolvers = {
         getSerie: async(root, { idSerie }) => {
             return await Series.findById(idSerie);
         },
-        getAllSeries: async(root, { idSerie }) => {
-            return await Series.findById(idSerie);
-        },
     },
     Mutation: {
         createSerie: async(root, { nombre, autor, estrellas, fechaLanzamiento }) => {
