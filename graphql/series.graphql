@@ -1,18 +1,15 @@
 type Serie {
     _id: ID
-    name: String!
-    author: String!
-    rating: String!
-    releaseDate: String!
-}
-
-type nuevaSerie {
-    _id: ID!
     name: String
+    author: String
+    rating: Float
+    releaseDate: String
 }
 
 type Query {
     getSerie(idSerie: ID): Serie
+
+    getAllSeries: [Serie!]!
 }
 
 type Mutation {
@@ -26,7 +23,7 @@ type Mutation {
         idSerie: ID!
         nombre: String!
         autor: String!
-        estrellas: String!
+        estrellas: Float!
         fechaLanzamiento: String!
     ): Serie
     deleteSerie(
