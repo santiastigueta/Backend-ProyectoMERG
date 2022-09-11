@@ -13,6 +13,9 @@ const serieSchema = new mongoose.Schema({
     },
     releaseDate: {
         type: String
+    },
+    image: {
+        type: String
     }
 
 });

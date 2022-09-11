@@ -1,4 +1,3 @@
-import conectarDB from '../config/db.js';
 import Series from '../models/seriesModel.js';
 
 const seriesResolvers = {
@@ -7,28 +6,36 @@ const seriesResolvers = {
             return await Series.findById(idSerie);
         },
         getAllSeries: async(root) => { // muestra todas las series
-            let misSeries = await Series.find({ rating: { $gte: '0' } }); // todas las series tienen un rating greater than or equal a 0. Entonces logro que se muestren todas.
+            let misSeries = await Series.find({});
+            /* let misSeries = await Series.find({
+                $or: [
+                    { rating: { $gte: '9.5' } },
+                    { name: "Handmaid's tale" }
+                ]
+            }); */
             console.log('series encontradas: ', misSeries);
             return misSeries;
-        }
+        },
     },
     Mutation: {
-        createSerie: async(root, { nombre, autor, estrellas, fechaLanzamiento }) => {
+        createSerie: async(root, { nombre, autor, estrellas, fechaLanzamiento, image }) => {
             let nuevaSerie = {}
             nuevaSerie.name = nombre;
             nuevaSerie.author = autor;
             nuevaSerie.rating = estrellas;
             nuevaSerie.releaseDate = fechaLanzamiento;
+            nuevaSerie.image = image;
             console.log(`Nueva serie agregada: ${nuevaSerie.name}`);
             return await Series.create(nuevaSerie);
         },
-        updateSerie: async(root, { idSerie, nombre, autor, estrellas, fechaLanzamiento }) => {
+        updateSerie: async(root, { idSerie, nombre, autor, estrellas, fechaLanzamiento, image }) => {
             let serieChange = await Series.findById(idSerie);
             serieChange.name = nombre;
             serieChange.author = autor;
             serieChange.rating = estrellas;
             serieChange.releaseDate = fechaLanzamiento;
-            console.log(`Se a actualizado ${serieChange} con éxito`);
+            serieChange.image = image;
+            console.log(`Se a actualizado ${serieChange.name} con éxito`);
             return await serieChange.save();
         },
         deleteSerie: async(root, { idSerie }) => {
