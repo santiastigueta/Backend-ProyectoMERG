@@ -16,6 +16,9 @@ const serieSchema = new mongoose.Schema({
     },
     image: {
         type: String
+    },
+    gender: {
+        type: String
     }
 
 });

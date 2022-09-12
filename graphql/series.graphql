@@ -5,6 +5,7 @@ type Serie {
     rating: Float
     releaseDate: String
     image: String 
+    gender: String
 }
 
 type Query {
@@ -20,6 +21,7 @@ type Mutation {
         estrellas: String
         fechaLanzamiento: String
         image: String
+        gender: String
     ): Serie
     updateSerie(
         idSerie: ID
@@ -28,6 +30,7 @@ type Mutation {
         estrellas: String
         fechaLanzamiento: String
         image: String
+        gender: String
     ): Serie
     deleteSerie(
         idSerie: ID!

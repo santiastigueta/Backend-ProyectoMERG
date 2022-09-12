@@ -18,23 +18,25 @@ const seriesResolvers = {
         },
     },
     Mutation: {
-        createSerie: async(root, { nombre, autor, estrellas, fechaLanzamiento, image }) => {
+        createSerie: async(root, { nombre, autor, estrellas, fechaLanzamiento, image, gender }) => {
             let nuevaSerie = {}
             nuevaSerie.name = nombre;
             nuevaSerie.author = autor;
             nuevaSerie.rating = estrellas;
             nuevaSerie.releaseDate = fechaLanzamiento;
             nuevaSerie.image = image;
+            nuevaSerie.gender = gender;
             console.log(`Nueva serie agregada: ${nuevaSerie.name}`);
             return await Series.create(nuevaSerie);
         },
-        updateSerie: async(root, { idSerie, nombre, autor, estrellas, fechaLanzamiento, image }) => {
+        updateSerie: async(root, { idSerie, nombre, autor, estrellas, fechaLanzamiento, image, gender }) => {
             let serieChange = await Series.findById(idSerie);
             serieChange.name = nombre;
             serieChange.author = autor;
             serieChange.rating = estrellas;
             serieChange.releaseDate = fechaLanzamiento;
             serieChange.image = image;
+            serieChange.gender = gender;
             console.log(`Se a actualizado ${serieChange.name} con éxito`);
             return await serieChange.save();
         },
