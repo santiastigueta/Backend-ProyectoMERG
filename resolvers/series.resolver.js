@@ -5,6 +5,10 @@ const seriesResolvers = {
         getSerie: async(root, { idSerie }) => { //encuentra 1 serie segun el ID
             return await Series.findById(idSerie);
         },
+        getSerieBusqueda: async(root) => {
+            const seriebusqueda = await Series.find({});
+            return seriebusqueda;
+        },
         getAllSeries: async(root) => { // muestra todas las series
             let misSeries = await Series.find({});
             /* let misSeries = await Series.find({
@@ -16,6 +20,15 @@ const seriesResolvers = {
             console.log('series encontradas: ', misSeries);
             return misSeries;
         },
+        getSerieFilter: async(root, { filter }) => {
+            // Filtro por nombre a traves del buscador. 
+
+
+            const buscarSerieFilter = await Series.find({ name: filter });
+            console.log('resultado: ', buscarSerieFilter);
+            return buscarSerieFilter;
+
+        }
     },
     Mutation: {
         createSerie: async(root, { nombre, autor, estrellas, fechaLanzamiento, image, gender }) => {

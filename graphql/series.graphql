@@ -2,16 +2,22 @@ type Serie {
     _id: ID
     name: String
     author: String
-    rating: Float
+    rating: String
     releaseDate: String
     image: String 
     gender: String
 }
+type SerieBusqueda{
+    _id: ID
+    name: String
+}
 
 type Query {
     getSerie(idSerie: ID): Serie
-
+    getSerieBusqueda: [SerieBusqueda]!
     getAllSeries: [Serie!]!
+
+    getSerieFilter(filter: String!): [Serie]
 }
 
 type Mutation {
