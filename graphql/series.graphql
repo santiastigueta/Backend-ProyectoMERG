@@ -6,6 +6,7 @@ type Serie {
     releaseDate: String
     image: String 
     gender: String
+    name_lower: String
 }
 type SerieBusqueda{
     _id: ID
@@ -17,7 +18,12 @@ type Query {
     getSerieBusqueda: [SerieBusqueda]!
     getAllSeries: [Serie!]!
 
-    getSerieFilter(filter: String!): [Serie]
+    getSeriesFilter(
+        autor: String
+        estrellas: String
+        fechaLanzamiento: String
+        gender: String
+    ): [Serie]
 }
 
 type Mutation {

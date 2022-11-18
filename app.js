@@ -5,30 +5,33 @@ import {
 } from 'apollo-server-core';
 import express from 'express';
 import http from 'http';
-import conectarDB from './config/db.js';
+
 import dotenv from 'dotenv';
+
+
+//resolvers
 import seriesResolvers from './resolvers/series.resolver.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+import userResolver from './resolvers/user.resolver.js';
+
+
+import mongoDb from './config/db.js'; // MONGODB
+import { mergeResolvers } from '@graphql-tools/merge';
+
 
 dotenv.config();
-conectarDB();
-const __filename = fileURLToPath(
-    import.meta.url);
+mongoDb();
 
 const port = process.env.PORT || 3000;
-const __dirname = path.dirname(__filename);
 const app = express();
 const httpServer = http.createServer(app);
 
+import typesArray from './utils/typeDefs.js';
+
+const resolvers = mergeResolvers([seriesResolvers, userResolver]);
 
 const server = new ApolloServer({
-    typeDefs: fs.readFileSync(
-        path.join(__dirname, './graphql/series.graphql'),
-        'utf8'
-    ),
-    resolvers: seriesResolvers,
+    typeDefs: typesArray,
+    resolvers: resolvers,
     csrfPrevention: true,
     cache: 'bounded',
     plugins: [
@@ -38,5 +41,6 @@ const server = new ApolloServer({
 });
 await server.start();
 server.applyMiddleware({ app });
-await new Promise(resolve => httpServer.listen({ port }, resolve));
+
+new Promise(resolve => httpServer.listen({ port }, resolve));
 console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);

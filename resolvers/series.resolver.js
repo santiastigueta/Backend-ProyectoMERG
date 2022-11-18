@@ -5,10 +5,6 @@ const seriesResolvers = {
         getSerie: async(root, { idSerie }) => { //encuentra 1 serie segun el ID
             return await Series.findById(idSerie);
         },
-        getSerieBusqueda: async(root) => {
-            const seriebusqueda = await Series.find({});
-            return seriebusqueda;
-        },
         getAllSeries: async(root) => { // muestra todas las series
             let misSeries = await Series.find({});
             /* let misSeries = await Series.find({
@@ -20,20 +16,25 @@ const seriesResolvers = {
             console.log('series encontradas: ', misSeries);
             return misSeries;
         },
-        getSerieFilter: async(root, { filter }) => {
-            // Filtro por nombre a traves del buscador. 
+        getSeriesFilter: async(root, { autor, estrellas, fechaLanzamiento, gender }) => {
+            let seriesFilter = await Series.find({
+                $or: [
+                    { author: autor },
+                    { rating: estrellas },
+                    { releaseDate: fechaLanzamiento },
+                    { gender: gender }
+                ]
 
-
-            const buscarSerieFilter = await Series.find({ name: filter });
-            console.log('resultado: ', buscarSerieFilter);
-            return buscarSerieFilter;
-
+            })
+            console.log("serieFilter: ", seriesFilter)
+            return seriesFilter;
         }
     },
     Mutation: {
         createSerie: async(root, { nombre, autor, estrellas, fechaLanzamiento, image, gender }) => {
             let nuevaSerie = {}
             nuevaSerie.name = nombre;
+            nuevaSerie.name_lower = nombre.toLowerCase();
             nuevaSerie.author = autor;
             nuevaSerie.rating = estrellas;
             nuevaSerie.releaseDate = fechaLanzamiento;
@@ -45,6 +46,7 @@ const seriesResolvers = {
         updateSerie: async(root, { idSerie, nombre, autor, estrellas, fechaLanzamiento, image, gender }) => {
             let serieChange = await Series.findById(idSerie);
             serieChange.name = nombre;
+            serieChange.name_lower = nombre.toLowerCase();
             serieChange.author = autor;
             serieChange.rating = estrellas;
             serieChange.releaseDate = fechaLanzamiento;

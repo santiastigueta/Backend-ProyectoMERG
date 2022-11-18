@@ -19,6 +19,9 @@ const serieSchema = new mongoose.Schema({
     },
     gender: {
         type: String
+    },
+    name_lower: {
+        type: String
     }
 
 });

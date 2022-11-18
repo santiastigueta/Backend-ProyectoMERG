@@ -11,7 +11,8 @@
     "author": "Santiago",
     "license": "ISC",
     "dependencies": {
-        "@graphql-tools/merge": "^8.3.3",
+        "@graphql-tools/load-files": "6.6.1",
+        "@graphql-tools/merge": "8.3.12",
         "@graphql-tools/schema": "^9.0.1",
         "apollo-server": "^3.10.1",
         "cors": "^2.8.5",
@@ -19,9 +20,13 @@
         "express": "^4.18.1",
         "express-graphql": "^0.12.0",
         "graphql": "^14.7.0",
+        "merge-graphql-schemas": "^1.7.8",
         "mongo": "^0.1.0",
         "mongodb": "^4.8.1",
         "mongoose": "^6.5.2",
-        "nodemon": "^2.0.19"
+        "nodemon": "^2.0.19",
+        "pg": "^8.8.0",
+        "pg-hstore": "^2.3.4",
+        "sequelize": "^6.25.6"
     }
 }
