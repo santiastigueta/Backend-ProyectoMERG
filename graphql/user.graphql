@@ -1,19 +1,30 @@
 type User{
     username: String!
     email: String!
-    bio: String!
+    password: String!
+    bio: String
     image: String
+    series: [Serie]
 }
-
+type Login{
+    user: User
+}
 type Query {
     getUsuarios: [User]
+    loginUsuario(
+        email: String!
+        password: String!
+    ): User
+    logout: Boolean
+    isLoggedIn: Boolean
 }
+
 
 type Mutation {
     registerUsuario(
         username: String!
         email: String!
-        hash: String!
+        password: String!
         bio: String
         image: String
     ): User

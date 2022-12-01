@@ -16,7 +16,7 @@ const seriesResolvers = {
             console.log('series encontradas: ', misSeries);
             return misSeries;
         },
-        getSeriesFilter: async(root, { autor, estrellas, fechaLanzamiento, gender }) => {
+        /* getSeriesFilter: async(root, { autor, estrellas, fechaLanzamiento, gender }) => {
             let seriesFilter = await Series.find({
                 $or: [
                     { author: autor },
@@ -28,7 +28,7 @@ const seriesResolvers = {
             })
             console.log("serieFilter: ", seriesFilter)
             return seriesFilter;
-        }
+        } */
     },
     Mutation: {
         createSerie: async(root, { nombre, autor, estrellas, fechaLanzamiento, image, gender }) => {
