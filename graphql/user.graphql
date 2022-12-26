@@ -9,23 +9,49 @@ type User{
 type Login{
     user: User
 }
+type UserQuery {
+    username: String!
+    email: String!
+    bio: String
+    image: String
+    series: [Serie]
+}
 type Query {
-    getUsuarios: [User]
+    getUsuarios: [UserQuery]
     loginUsuario(
         email: String!
         password: String!
-    ): User
-    logout: Boolean
-    isLoggedIn: Boolean
+    ): String 
 }
 
+type Serie {
+    _id: ID
+    name: String
+    author: String
+    rating: String
+    releaseDate: String
+    image: String 
+    gender: String
+    name_lower: String
+}
 
 type Mutation {
     registerUsuario(
         username: String!
         email: String!
         password: String!
-        bio: String
+    ): String 
+    createSerieUser(
+        userId: ID!
+        nombre: String!
+        autor: String
+        estrellas: String
+        fechaLanzamiento: String
         image: String
+        gender: String
+    ): Serie
+    asignarSerieUser(
+        userId: ID
+        serieId: ID
     ): User
 }

@@ -8,6 +8,7 @@ import http from 'http';
 
 import dotenv from 'dotenv';
 
+import authenticate from './middlewares/auth.js';
 
 //resolvers
 import seriesResolvers from './resolvers/series.resolver.js';
@@ -19,16 +20,15 @@ import { mergeResolvers } from '@graphql-tools/merge';
 
 
 dotenv.config();
-mongoDb();
+
 
 const port = process.env.PORT || 3000;
 const app = express();
+app.use(authenticate)
 const httpServer = http.createServer(app);
 
 import typesArray from './utils/typeDefs.js';
-
 const resolvers = mergeResolvers([seriesResolvers, userResolver]);
-
 const server = new ApolloServer({
     typeDefs: typesArray,
     resolvers: resolvers,
@@ -39,8 +39,8 @@ const server = new ApolloServer({
         ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
 });
+mongoDb();
 await server.start();
 server.applyMiddleware({ app });
-
 new Promise(resolve => httpServer.listen({ port }, resolve));
 console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);

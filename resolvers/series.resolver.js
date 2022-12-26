@@ -5,7 +5,7 @@ const seriesResolvers = {
         getSerie: async(root, { idSerie }) => { //encuentra 1 serie segun el ID
             return await Series.findById(idSerie);
         },
-        getAllSeries: async(root) => { // muestra todas las series
+        getAllSeries: async(root, args, context, info) => { // muestra todas las series
             let misSeries = await Series.find({});
             /* let misSeries = await Series.find({
                 $or: [
@@ -13,7 +13,6 @@ const seriesResolvers = {
                     { name: "Handmaid's tale" }
                 ]
             }); */
-            console.log('series encontradas: ', misSeries);
             return misSeries;
         },
         /* getSeriesFilter: async(root, { autor, estrellas, fechaLanzamiento, gender }) => {
