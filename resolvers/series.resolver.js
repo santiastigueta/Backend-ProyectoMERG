@@ -7,13 +7,8 @@ const seriesResolvers = {
         },
         getAllSeries: async(root, args, context, info) => { // muestra todas las series
             let misSeries = await Series.find({});
-            /* let misSeries = await Series.find({
-                $or: [
-                    { rating: { $gte: '9.5' } },
-                    { name: "Handmaid's tale" }
-                ]
-            }); */
             return misSeries;
+            //getAllSeries es el public Post
         },
         /* getSeriesFilter: async(root, { autor, estrellas, fechaLanzamiento, gender }) => {
             let seriesFilter = await Series.find({

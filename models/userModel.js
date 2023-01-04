@@ -25,7 +25,8 @@ const User = new mongoose.Schema({
     },
     bio: String,
     image: String,
-    series: [{ type: Schema.Types.ObjectId, ref: 'Series' }]
+    series: [{ type: Schema.Types.ObjectId, ref: 'Series' }],
+    refreshToken: String
 });
 
 

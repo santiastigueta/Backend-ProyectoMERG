@@ -16,14 +16,6 @@ type UserQuery {
     image: String
     series: [Serie]
 }
-type Query {
-    getUsuarios: [UserQuery]
-    loginUsuario(
-        email: String!
-        password: String!
-    ): String 
-}
-
 type Serie {
     _id: ID
     name: String
@@ -34,7 +26,14 @@ type Serie {
     gender: String
     name_lower: String
 }
-
+type Query {
+    getUsuarios: [UserQuery]
+    loginUsuario(
+        email: String!
+        password: String!
+    ): String 
+    
+}
 type Mutation {
     registerUsuario(
         username: String!
@@ -53,5 +52,5 @@ type Mutation {
     asignarSerieUser(
         userId: ID
         serieId: ID
-    ): User
+    ): String
 }

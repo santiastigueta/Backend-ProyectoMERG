@@ -5,14 +5,19 @@ import bcrypt from "bcrypt";
 
 import Usuario from "../models/userModel.js";
 import Series from "../models/seriesModel.js";
-import createJWTToken from "../utils/auth.js";
+
+// tokens
+import createJWTToken  from "../utils/auth.js";
+import createRefreshJWTToken from "../utils/auth.js";
+import sendAccesToken from "../utils/auth.js";
+import sendRefreshToken from "../utils/auth.js";
 
 import createSerieResolver from "./createSerie.resolver.js";
 
 const userResolver = {
     Query: {
         getUsuarios: async(root) => {
-            const allUsers = await Usuario.find({});
+            const allUsers = await Usuario.find({}).populate("series");
             console.log("allusers: ", allUsers);
             return allUsers;
         },
@@ -21,20 +26,25 @@ const userResolver = {
                     email: email,
                     //password: password
                 })
-                .select("password")
-                .select("email")
-                .select("username");
+                .select("password").select("refreshToken");
             if (!usuarioLogin) throw new Error("No se encontró el usuario");
             const isMatch = await bcrypt.compare(password, usuarioLogin.password);
             if (!isMatch) throw new Error("Usuario o contraseña incorrectos");
-            const loginToken = createJWTToken({
-                _id: usuarioLogin._id,
-                email: usuarioLogin.email,
-                username: usuarioLogin.username,
+            const token = createJWTToken({
+                _id: usuarioLogin._id
             });
-            console.log(loginToken);
-            return loginToken;
+            const refreshToken = createRefreshJWTToken({
+                _id: usuarioLogin._id
+            });
+            usuarioLogin.refreshToken = refreshToken;
+            console.log('usuario logueado: ', usuarioLogin);
+
+            return token;
         },
+        //getPrivateSeries: async() => { // este es el private Post
+            // necesita el authToken (no se como xd)
+            
+        //}
     },
     Mutation: {
         registerUsuario: async(root, { username, email, password }) => {
@@ -58,6 +68,7 @@ const userResolver = {
             console.log(token);
             return token;
         },
+        
         createSerieUser: async(
             root, { userId, nombre, autor, estrellas, fechaLanzamiento, image, gender }
         ) => {
@@ -79,11 +90,15 @@ const userResolver = {
         },
         asignarSerieUser: async(root, { userId, serieId }) => {
             const user = await Usuario.findById(userId);
-            user.series = serieId;
+            const seriesUser = [...user.series, serieId];
+            console.log('seriesUser: ', seriesUser);
+            user.series = seriesUser;
             console.log("asignada una serie a usuario: ", user);
-            return await user.save();
+            await user.save();
+            return 'agregada serie con éxito';
         },
         //investigar el motodo populate de mongoose
+        // no voy a hacer public post. Para ver las series si o si hay que loguearse
     },
 };
 

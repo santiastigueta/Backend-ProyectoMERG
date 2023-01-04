@@ -20,8 +20,6 @@ import { mergeResolvers } from '@graphql-tools/merge';
 
 
 dotenv.config();
-
-
 const port = process.env.PORT || 3000;
 const app = express();
 app.use(authenticate)
