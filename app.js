@@ -22,7 +22,7 @@ import { mergeResolvers } from '@graphql-tools/merge';
 dotenv.config();
 const port = process.env.PORT || 3000;
 const app = express();
-app.use(authenticate)
+//app.use(authenticate)
 const httpServer = http.createServer(app);
 
 import typesArray from './utils/typeDefs.js';
@@ -36,6 +36,7 @@ const server = new ApolloServer({
         ApolloServerPluginDrainHttpServer({ httpServer }),
         ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
+    context: ({ req, res }) => ({ req, res })
 });
 mongoDb();
 await server.start();

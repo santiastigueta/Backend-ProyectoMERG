@@ -1,28 +1,13 @@
-import pkg from 'jsonwebtoken'
-const authenticate = (req, res, next) => {
+import pkg from 'jsonwebtoken';
+const { verify } = pkg;
 
-    /* const token = req.headers.authorization ? .split(' ')[1]
-    console.log(token);
-    next() */
+const isAuth = (req, res) => {
 
-    /* const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    if (!token) throw new Error("token inválido");
-    console.log('token middleware: ', token); */
-    try {
-        const authHeader = req.headers.authorization;
-        if (!authHeader) throw new Error("No authorization");
-        const token = authHeader.split(" ")[1];
+    const authorization = req.headers['authorization'];
+    if (!authorization) throw new Error("You need to Login");
+    const token = authorization.split(" ")[1];
+    const { userId } = verify(token, process.env.ACCESS_TOKEN_SECRET);
+    return userId;
+};
 
-        const verified = pkg.verify(token, 'mySuperSecretCryptoKey123')
-        req.verifiedUser = verified;
-        //console.log(verified)
-        //req.authorization = verified.user
-        next();
-    } catch (error) {
-        next();
-    }
-
-}
-// 
-export default authenticate;
+export default isAuth;

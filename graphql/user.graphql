@@ -28,18 +28,21 @@ type Serie {
 }
 type Query {
     getUsuarios: [UserQuery]
-    loginUsuario(
-        email: String!
-        password: String!
-    ): String 
-    
 }
+
 type Mutation {
     registerUsuario(
         username: String!
         email: String!
         password: String!
     ): String 
+    loginUsuario(
+        email: String!
+        password: String!
+    ): String 
+    logOut: String
+    isProtected: String
+    sendRefreshToken: String
     createSerieUser(
         userId: ID!
         nombre: String!

@@ -1,31 +1,31 @@
 import pkg from 'jsonwebtoken'
 
-const createJWTToken = user => {
-    return pkg.sign({ user }, 'mySuperSecretCryptoKey123', {
+const createJWTToken = userId => {
+    return pkg.sign({ userId }, 'mySuperSecretCryptoKey123', {
         expiresIn: '15m'
     });
 };
 
-const createRefreshJWTToken = user => {
-    return pkg.sign({ user }, 'refreshSecretToken123', {
+const createRefreshJWTToken = userId => {
+    return pkg.sign({ userId }, 'refreshSecretToken123', {
         expiresIn: '7d'
     });
 };
-const sendAccesToken = (res, req, accestoken) => {
+/* const sendAccesToken = (res, req, accestoken) => {
     res.send({
         accestoken,
         email: req.body.email
     })
-}
-const sendRefreshToken = (res, refreshToken)=>{
-    res.cookie('refreshtoken', token, {
+} */
+const sendRefreshToken = (res, refreshToken) => {
+    res.cookie('refreshtoken', refreshToken, {
         httpOnly: true,
-        path: '/refresh_token'
+        //path: '/refresh_token'
     })
 }
-export default {
+export {
     createJWTToken,
     createRefreshJWTToken,
-    sendAccesToken,
+    //sendAccesToken,
     sendRefreshToken
 };
