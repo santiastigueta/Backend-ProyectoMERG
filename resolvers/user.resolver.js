@@ -2,7 +2,7 @@
 //registro e inicio de sesión
 
 import bcrypt from "bcrypt";
-
+import { Jwt } from "jsonwebtoken";
 import Usuario from "../models/userModel.js";
 import Series from "../models/seriesModel.js";
 
@@ -10,15 +10,14 @@ import Series from "../models/seriesModel.js";
 import { createJWTToken } from "../utils/auth.js";
 import { createRefreshJWTToken } from "../utils/auth.js";
 //import { sendAccesToken } from "../utils/auth.js";
-import { sendRefreshToken } from "../utils/auth.js";
+//import { sendRefreshToken } from "../utils/auth.js";
 import isAuth from "../middlewares/auth.js";
 
 import createSerieResolver from "./createSerie.resolver.js";
 
-
-import cookieParser from "cookie-parser";
 import verify from "jsonwebtoken";
 
+let refreshTokens  = []; 
 const userResolver = {
     Query: {
         getUsuarios: async(root) => {
@@ -79,7 +78,7 @@ const userResolver = {
                 });
                 usuarioLogin.refreshToken = refreshToken;
                 usuarioLogin.save();
-                sendRefreshToken(res, refreshToken);
+                //sendRefreshToken(res, refreshToken);
                 console.log('usuario logueado: ', usuarioLogin);
                 //sendAccesToken(res, req, accesToken);
                 console.log('hay cookies cuando me logueo? : ', req)
@@ -88,48 +87,30 @@ const userResolver = {
                 console.log("login error: ", error)
             }
         },
-        logOut: async(root, args, { _req, res }) => {
-            res.clearCookie('refreshtoken');
-            return 'Logged out'
+        logOut: async(root, args, { req, res }) => {
+            const refreshToken = req.header("x-auth-token");
+            refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+            console.log('logged out')
+            return 'Logged out';
         },
-        isProtected: async(root, args, { req, res }) => {
-
-            console.log("cookies: ", req.cookieParser)
+        createAccTokenfromRefreshToken: async (root, args, {req, res}) => {
+            const refreshToken = req.header("x-auth-token");
+            if (!refreshToken) return "No se encontró el x-auth-token";
+            if(!refreshTokens.includes(refreshToken)) return "refresh token invalido (??)";
             try {
-                const userId = isAuth(req);
-                if (userId !== null) {
-                    console.log("protected data")
-                    return 'this is protected data'
-                } else {
-                    return 'this is not protected data'
-                }
+                const user = await Jwt.verify(
+                    refreshToken, 
+                    'refreshSecretToken123'
+                );
+                const {_id} = user; 
+                const accesToken = await Jwt.sign(
+                    {_id}, 'mySuperSecretCryptoKey123', 
+                    {expiresIn: "1m"}
+                );
+                return accesToken;
             } catch (error) {
-                console.log('error isProtected: ', error)
+                console.log("token invalido: ", error)
             }
-        },
-        // REFRESH TOKEN
-        sendRefreshToken: async(root, args, { req, res }) => {
-            console.log("hay cookies? ", req.cookies)
-            const token = req.cookies.refreshtoken;
-            console.log("token?: ", token)
-            if (!token) return 'no hay token';
-            let payload = null;
-            try {
-                payload = verify(token, process.env.REFRESH_TOKEN);
-            } catch (error) {
-                return 'Error'
-            }
-            console.log('payload.userId: ', payload.userId)
-            const user = Usuario.findOne({ _id: payload.userId })
-            if (!user) return 'no se encontro user';
-            if (user.refreshToken !== token) {
-                return 'el token no coincide...'
-            };
-            const accestoken = createJWTToken(user._id);
-            const refreshtoken = createRefreshJWTToken(user._id);
-            user.refreshToken = refreshtoken;
-            sendRefreshToken(res, refreshtoken);
-            return accestoken;
         },
         createSerieUser: async(
             root, { userId, nombre, autor, estrellas, fechaLanzamiento, image, gender }

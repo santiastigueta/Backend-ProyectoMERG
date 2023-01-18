@@ -17,12 +17,12 @@ const createRefreshJWTToken = userId => {
         email: req.body.email
     })
 } */
-const sendRefreshToken = (res, refreshToken) => {
+/* const sendRefreshToken = (res, refreshToken) => {
     res.cookie('refreshtoken', refreshToken, {
         httpOnly: true,
         //path: '/refresh_token'
     })
-}
+} */
 export {
     createJWTToken,
     createRefreshJWTToken,
