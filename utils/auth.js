@@ -26,6 +26,4 @@ const createRefreshJWTToken = userId => {
 export {
     createJWTToken,
     createRefreshJWTToken,
-    //sendAccesToken,
-    sendRefreshToken
 };

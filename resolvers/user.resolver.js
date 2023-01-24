@@ -2,7 +2,7 @@
 //registro e inicio de sesión
 
 import bcrypt from "bcrypt";
-import { Jwt } from "jsonwebtoken";
+import pkg from 'jsonwebtoken'
 import Usuario from "../models/userModel.js";
 import Series from "../models/seriesModel.js";
 
@@ -78,10 +78,6 @@ const userResolver = {
                 });
                 usuarioLogin.refreshToken = refreshToken;
                 usuarioLogin.save();
-                //sendRefreshToken(res, refreshToken);
-                console.log('usuario logueado: ', usuarioLogin);
-                //sendAccesToken(res, req, accesToken);
-                console.log('hay cookies cuando me logueo? : ', req)
                 return accesToken;
             } catch (error) {
                 console.log("login error: ", error)
@@ -98,12 +94,12 @@ const userResolver = {
             if (!refreshToken) return "No se encontró el x-auth-token";
             if(!refreshTokens.includes(refreshToken)) return "refresh token invalido (??)";
             try {
-                const user = await Jwt.verify(
+                const user = await pkg.verify(
                     refreshToken, 
                     'refreshSecretToken123'
                 );
                 const {_id} = user; 
-                const accesToken = await Jwt.sign(
+                const accesToken = await pkg.sign(
                     {_id}, 'mySuperSecretCryptoKey123', 
                     {expiresIn: "1m"}
                 );

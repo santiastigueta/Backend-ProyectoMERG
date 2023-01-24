@@ -43,6 +43,7 @@ type Mutation {
     logOut: String
     isProtected: String
     sendRefreshToken: String
+    createAccTokenfromRefreshToken: String
     createSerieUser(
         userId: ID!
         nombre: String!
