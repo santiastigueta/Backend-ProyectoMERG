@@ -16,18 +16,13 @@ type SerieBusqueda{
 type Query {
     getSerie(idSerie: ID): Serie
     getSerieBusqueda: [SerieBusqueda]!
-    getAllSeries: [Serie!]!
-
-    getSeriesFilter(
-        autor: String
-        estrellas: String
-        fechaLanzamiento: String
-        gender: String
-    ): [Serie]
+    getAllSeries(userId: ID): [Serie!]!
+    getAllseriesUser(userId: ID): [Serie]
 }
 
 type Mutation {
     createSerie(
+        userId: String!
         nombre: String!
         autor: String
         estrellas: String
@@ -43,6 +38,7 @@ type Mutation {
         fechaLanzamiento: String
         image: String
         gender: String
+        userId: String
     ): Serie
     deleteSerie(
         idSerie: ID!

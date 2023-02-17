@@ -16,8 +16,9 @@ import isAuth from "../middlewares/auth.js";
 import createSerieResolver from "./createSerie.resolver.js";
 
 import verify from "jsonwebtoken";
+import authToken from "../middlewares/auth.js";
 
-let refreshTokens  = []; 
+let refreshTokens = [];
 const userResolver = {
     Query: {
         getUsuarios: async(root) => {
@@ -89,20 +90,17 @@ const userResolver = {
             console.log('logged out')
             return 'Logged out';
         },
-        createAccTokenfromRefreshToken: async (root, args, {req, res}) => {
+        createAccTokenfromRefreshToken: async(root, args, { req, res }) => {
             const refreshToken = req.header("x-auth-token");
             if (!refreshToken) return "No se encontró el x-auth-token";
-            if(!refreshTokens.includes(refreshToken)) return "refresh token invalido (??)";
+            if (!refreshTokens.includes(refreshToken)) return "refresh token invalido (??)";
             try {
                 const user = await pkg.verify(
-                    refreshToken, 
+                    refreshToken,
                     'refreshSecretToken123'
                 );
-                const {_id} = user; 
-                const accesToken = await pkg.sign(
-                    {_id}, 'mySuperSecretCryptoKey123', 
-                    {expiresIn: "1m"}
-                );
+                const { _id } = user;
+                const accesToken = await pkg.sign({ _id }, 'mySuperSecretCryptoKey123', { expiresIn: "1m" });
                 return accesToken;
             } catch (error) {
                 console.log("token invalido: ", error)
@@ -111,6 +109,7 @@ const userResolver = {
         createSerieUser: async(
             root, { userId, nombre, autor, estrellas, fechaLanzamiento, image, gender }
         ) => {
+            //createSerieUser está sin uso.
             const nuevaSerie = await createSerieResolver(
                 userId,
                 nombre,
@@ -129,15 +128,44 @@ const userResolver = {
         },
         asignarSerieUser: async(root, { userId, serieId }) => {
             const user = await Usuario.findById(userId);
-            const seriesUser = [...user.series, serieId];
-            console.log('seriesUser: ', seriesUser);
-            user.series = seriesUser;
-            console.log("asignada una serie a usuario: ", user);
+            const serieFind = await Series.findById(serieId);
+
+            const serie = serieFind._id.toString();
+            const seriesDelUser = [user.series].toString();
+            const arraySeries = seriesDelUser.split(',');
+            const seriesUser = [...arraySeries, serie];
+            // Estoy evitando que se repita la serie al agregarla.
+            function removeDuplicates(arr) {
+                let unique = [];
+                arr.forEach(element => {
+                    if (!unique.includes(element)) {
+                        unique.push(element);
+                    }
+                });
+                return unique;
+            };
+            const result = removeDuplicates(seriesUser);
+            user.series = result;
+
             await user.save();
             return 'agregada serie con éxito';
         },
-        //investigar el motodo populate de mongoose
-        // no voy a hacer public post. Para ver las series si o si hay que loguearse
+        // esta funcion hace el efecto contrario a asignarSeriesUser, elimina una serie de la lista de un usuario. 
+        deleteSeriesFromUser: async(root, { userId, serieId }, { req, res, next }, info) => {
+            authToken(req, res, next);
+
+            const user = await Usuario.findById(userId);
+            const serieFind = await Series.findById(serieId);
+
+            const serie = serieFind._id.toString();
+            const seriesDelUser = [user.series].toString();
+            const arraySeries = seriesDelUser.split(',');
+            const result = arraySeries.filter(element => element !== serie);
+
+            user.series = result;
+            await user.save();
+            return 'Serie eliminada '
+        }
     },
 };
 
