@@ -2,7 +2,7 @@
 //registro e inicio de sesión
 
 import bcrypt from "bcrypt";
-
+import pkg from 'jsonwebtoken'
 import Usuario from "../models/userModel.js";
 import Series from "../models/seriesModel.js";
 
@@ -10,15 +10,15 @@ import Series from "../models/seriesModel.js";
 import { createJWTToken } from "../utils/auth.js";
 import { createRefreshJWTToken } from "../utils/auth.js";
 //import { sendAccesToken } from "../utils/auth.js";
-import { sendRefreshToken } from "../utils/auth.js";
+//import { sendRefreshToken } from "../utils/auth.js";
 import isAuth from "../middlewares/auth.js";
 
 import createSerieResolver from "./createSerie.resolver.js";
 
-
-import cookieParser from "cookie-parser";
 import verify from "jsonwebtoken";
+import authToken from "../middlewares/auth.js";
 
+let refreshTokens = [];
 const userResolver = {
     Query: {
         getUsuarios: async(root) => {
@@ -26,11 +26,24 @@ const userResolver = {
             console.log("allusers: ", allUsers);
             return allUsers;
         },
+        // esta funcion va a determinar mediante true or false si la serie pertenece a un usuario en específico. 
+        selfSerie: async(root, { userId, serieId }, context, info) => {
+            const user = await Usuario.findById(userId);
+            const serieFind = await Series.findById(serieId);
 
-        //getPrivateSeries: async() => { // este es el private Post
-        // necesita el authToken (no se como xd)
+            const serie = serieFind._id.toString();
+            const seriesDelUser = [user.series].toString();
+            const arraySeries = seriesDelUser.split(',');
 
-        //}
+            console.log("arraySeries: ", arraySeries);
+            console.log("serie: ", serie);
+            const result = arraySeries.some(id => id === serie);
+            console.log("resultado: ", result);
+            // Si el resultado es true es porque la serie está en la lista del usuario
+            // si el resultado es false, es porque la serie no está en la lista.
+
+            return result;
+        }
     },
     Mutation: {
         registerUsuario: async(root, { username, email, password }) => {
@@ -79,61 +92,37 @@ const userResolver = {
                 });
                 usuarioLogin.refreshToken = refreshToken;
                 usuarioLogin.save();
-                sendRefreshToken(res, refreshToken);
-                console.log('usuario logueado: ', usuarioLogin);
-                //sendAccesToken(res, req, accesToken);
-                console.log('hay cookies cuando me logueo? : ', req)
                 return accesToken;
             } catch (error) {
                 console.log("login error: ", error)
             }
         },
-        logOut: async(root, args, { _req, res }) => {
-            res.clearCookie('refreshtoken');
-            return 'Logged out'
+        logOut: async(root, args, { req, res }) => {
+            const refreshToken = req.header("x-auth-token");
+            refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+            console.log('logged out')
+            return 'Logged out';
         },
-        isProtected: async(root, args, { req, res }) => {
-
-            console.log("cookies: ", req.cookieParser)
+        createAccTokenfromRefreshToken: async(root, args, { req, res }) => {
+            const refreshToken = req.header("x-auth-token");
+            if (!refreshToken) return "No se encontró el x-auth-token";
+            if (!refreshTokens.includes(refreshToken)) return "refresh token invalido (??)";
             try {
-                const userId = isAuth(req);
-                if (userId !== null) {
-                    console.log("protected data")
-                    return 'this is protected data'
-                } else {
-                    return 'this is not protected data'
-                }
+                const user = await pkg.verify(
+                    refreshToken,
+                    'refreshSecretToken123'
+                );
+                const { _id } = user;
+                const accesToken = await pkg.sign({ _id }, 'mySuperSecretCryptoKey123', { expiresIn: "1m" });
+                return accesToken;
             } catch (error) {
-                console.log('error isProtected: ', error)
+                console.log("token invalido: ", error)
             }
-        },
-        // REFRESH TOKEN
-        sendRefreshToken: async(root, args, { req, res }) => {
-            console.log("hay cookies? ", req.cookies)
-            const token = req.cookies.refreshtoken;
-            console.log("token?: ", token)
-            if (!token) return 'no hay token';
-            let payload = null;
-            try {
-                payload = verify(token, process.env.REFRESH_TOKEN);
-            } catch (error) {
-                return 'Error'
-            }
-            console.log('payload.userId: ', payload.userId)
-            const user = Usuario.findOne({ _id: payload.userId })
-            if (!user) return 'no se encontro user';
-            if (user.refreshToken !== token) {
-                return 'el token no coincide...'
-            };
-            const accestoken = createJWTToken(user._id);
-            const refreshtoken = createRefreshJWTToken(user._id);
-            user.refreshToken = refreshtoken;
-            sendRefreshToken(res, refreshtoken);
-            return accestoken;
         },
         createSerieUser: async(
             root, { userId, nombre, autor, estrellas, fechaLanzamiento, image, gender }
         ) => {
+            //createSerieUser está sin uso.
             const nuevaSerie = await createSerieResolver(
                 userId,
                 nombre,
@@ -152,16 +141,61 @@ const userResolver = {
         },
         asignarSerieUser: async(root, { userId, serieId }) => {
             const user = await Usuario.findById(userId);
-            const seriesUser = [...user.series, serieId];
-            console.log('seriesUser: ', seriesUser);
-            user.series = seriesUser;
-            console.log("asignada una serie a usuario: ", user);
+            const serieFind = await Series.findById(serieId);
+            console.log("user.series: ", user.series);
+
+            const serie = serieFind._id.toString();
+            console.log("serie: ", serie);
+
+            if (user.series = []) user.series = serie;
+            const seriesDelUser = [user.series].toString();
+            console.log("seriesDelUser: ", seriesDelUser);
+
+            const arraySeries = seriesDelUser.split(',');
+            console.log("arraySeries: ", arraySeries);
+
+            const seriesUser = [...arraySeries, serie];
+            console.log("seriesUser: ", seriesUser);
+            // Estoy evitando que se repita la serie al agregarla.
+            function removeDuplicates(arr) {
+                let unique = [];
+                arr.forEach(element => {
+                    if (!unique.includes(element)) {
+                        unique.push(element);
+                    }
+                });
+                return unique;
+            };
+            const result = removeDuplicates(seriesUser);
+            console.log("resultado: ", result);
+            user.series = result;
+
             await user.save();
             return 'agregada serie con éxito';
         },
-        //investigar el motodo populate de mongoose
-        // no voy a hacer public post. Para ver las series si o si hay que loguearse
+        // esta funcion hace el efecto contrario a asignarSeriesUser, elimina una serie de la lista de un usuario. 
+        deleteSeriesFromUser: async(root, { userId, serieId }, { req, res, next }, info) => {
+            authToken(req, res, next);
+
+            const user = await Usuario.findById(userId);
+            const serieFind = await Series.findById(serieId);
+
+            const serie = serieFind._id.toString();
+            const seriesDelUser = [user.series].toString();
+            const arraySeries = seriesDelUser.split(',');
+            const result = arraySeries.filter(element => element !== serie);
+
+            user.series = result;
+            await user.save();
+            return 'Serie eliminada '
+        },
+
     },
 };
 
 export default userResolver;
+
+// hacer:
+// el boton de eliminar serie que sea un boton flotante derecha inferior (al estilo whattsap icon).
+// crear una funcion bool que determine si el usuario es admin o no (si es admin, puede eliminar serie).
+// crear una funcion bool que determine si el usuario tiene ésa serie, y si la tiene que sea capaz de quitarla de su lista.
