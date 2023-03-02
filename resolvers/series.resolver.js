@@ -27,8 +27,7 @@ const seriesResolvers = {
             nuevaSerie.name = nombre;
             const user = await Usuario.findById(userId).populate('series');
             console.log("usuario: ", user)
-            const seriesUser = [...user.series, nuevaSerie.name]
-            user.series = seriesUser;
+                //nuevaSerie.user = user;
             nuevaSerie.name_lower = nombre.toLowerCase();
             nuevaSerie.author = autor;
             nuevaSerie.rating = estrellas;
@@ -36,13 +35,14 @@ const seriesResolvers = {
             nuevaSerie.image = image;
             nuevaSerie.gender = gender;
             console.log(`Nueva serie agregada: ${nuevaSerie.name}`);
+            const serieCreada = await Series.create(nuevaSerie);
+            user.series.push(serieCreada);
             await user.save();
-            return await Series.create(nuevaSerie);
+            console.log("serie creada: ", nuevaSerie);
+            console.log("Usuario actualizado: ", user);
+            return 'Serie creada con éxito';
+
         },
-        // EL CREATE SERIE QUE SEA PARA TODOS LOS USUARIOS Y PARA QUE UN USUARIO AGREGUE UNA SERIE, QUE SE LE DE ELEGIR UN CATALOGO DE SERIES CREADOS POR LOS USUARIOS. 
-
-
-
         updateSerie: async(root, { idSerie, nombre, autor, estrellas, fechaLanzamiento, image, gender }) => {
             let serieChange = await Series.findById(idSerie);
             serieChange.name = nombre;

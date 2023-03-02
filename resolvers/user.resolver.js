@@ -26,11 +26,24 @@ const userResolver = {
             console.log("allusers: ", allUsers);
             return allUsers;
         },
+        // esta funcion va a determinar mediante true or false si la serie pertenece a un usuario en específico. 
+        selfSerie: async(root, { userId, serieId }, context, info) => {
+            const user = await Usuario.findById(userId);
+            const serieFind = await Series.findById(serieId);
 
-        //getPrivateSeries: async() => { // este es el private Post
-        // necesita el authToken (no se como xd)
+            const serie = serieFind._id.toString();
+            const seriesDelUser = [user.series].toString();
+            const arraySeries = seriesDelUser.split(',');
 
-        //}
+            console.log("arraySeries: ", arraySeries);
+            console.log("serie: ", serie);
+            const result = arraySeries.some(id => id === serie);
+            console.log("resultado: ", result);
+            // Si el resultado es true es porque la serie está en la lista del usuario
+            // si el resultado es false, es porque la serie no está en la lista.
+
+            return result;
+        }
     },
     Mutation: {
         registerUsuario: async(root, { username, email, password }) => {
@@ -129,11 +142,20 @@ const userResolver = {
         asignarSerieUser: async(root, { userId, serieId }) => {
             const user = await Usuario.findById(userId);
             const serieFind = await Series.findById(serieId);
+            console.log("user.series: ", user.series);
 
             const serie = serieFind._id.toString();
+            console.log("serie: ", serie);
+
+            if (user.series = []) user.series = serie;
             const seriesDelUser = [user.series].toString();
+            console.log("seriesDelUser: ", seriesDelUser);
+
             const arraySeries = seriesDelUser.split(',');
+            console.log("arraySeries: ", arraySeries);
+
             const seriesUser = [...arraySeries, serie];
+            console.log("seriesUser: ", seriesUser);
             // Estoy evitando que se repita la serie al agregarla.
             function removeDuplicates(arr) {
                 let unique = [];
@@ -145,6 +167,7 @@ const userResolver = {
                 return unique;
             };
             const result = removeDuplicates(seriesUser);
+            console.log("resultado: ", result);
             user.series = result;
 
             await user.save();
@@ -165,8 +188,14 @@ const userResolver = {
             user.series = result;
             await user.save();
             return 'Serie eliminada '
-        }
+        },
+
     },
 };
 
 export default userResolver;
+
+// hacer:
+// el boton de eliminar serie que sea un boton flotante derecha inferior (al estilo whattsap icon).
+// crear una funcion bool que determine si el usuario es admin o no (si es admin, puede eliminar serie).
+// crear una funcion bool que determine si el usuario tiene ésa serie, y si la tiene que sea capaz de quitarla de su lista.

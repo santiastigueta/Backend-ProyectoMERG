@@ -28,6 +28,10 @@ type Serie {
 }
 type Query {
     getUsuarios: [UserQuery]
+    selfSerie(
+        userId: ID!
+        serieId: ID!
+    ): Boolean!
 }
 
 type Mutation {
