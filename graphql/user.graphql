@@ -28,6 +28,10 @@ type Serie {
 }
 type Query {
     getUsuarios: [UserQuery]
+    selfSerie(
+        userId: ID!
+        serieId: ID!
+    ): Boolean!
 }
 
 type Mutation {
@@ -43,6 +47,7 @@ type Mutation {
     logOut: String
     isProtected: String
     sendRefreshToken: String
+    createAccTokenfromRefreshToken: String
     createSerieUser(
         userId: ID!
         nombre: String!
@@ -55,5 +60,9 @@ type Mutation {
     asignarSerieUser(
         userId: ID
         serieId: ID
+    ): String
+    deleteSeriesFromUser(
+        userId: ID!
+        serieId: ID!
     ): String
 }

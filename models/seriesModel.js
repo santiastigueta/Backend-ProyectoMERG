@@ -4,6 +4,7 @@ import Schema from "mongoose";
 const serieSchema = new mongoose.Schema({
     name: {
         type: String,
+        unique: true
     },
     author: {
         type: String
