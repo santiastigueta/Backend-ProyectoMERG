@@ -150,6 +150,7 @@ const userResolver = {
             await user.save();
             return nuevaSerie;
         },
+
         asignarSerieUser: async(root, { userId, serieId }) => {
             const user = await Usuario.findById(userId);
             const seriesUser = [...user.series, serieId];
